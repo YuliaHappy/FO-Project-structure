@@ -1,0 +1,1 @@
+{"version":3,"sources":["styles/style.css"],"names":[],"mappings":"AAAA;IACI,sBAAc;IAAd,qBAAc;IAAd,cAAc;IACd,eAAe;CAClB","file":"styles/style.css","sourcesContent":[".dlg-button {\r\n    display: flex;\r\n    transition: 1s;\r\n}"],"sourceRoot":"/source/"}
