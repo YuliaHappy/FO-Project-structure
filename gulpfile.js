@@ -14,7 +14,6 @@ const gutil = require('gulp-util');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 gulp.task('browserify', function() {
-  var files = require('glob').sync("frontend/scripts/index.js");
   return browserify({
       enteries: ['frontend/scripts/index.js'],
       debug: true
@@ -46,23 +45,25 @@ gulp.task('clean', function() {
 const debug = require('gulp-debug');
 gulp.task('styles', function() {
 	return gulp
-    .src('frontend/styles/main.styl', {base: 'frontend'})
+    .src('frontend/styles/main.styl')
 		.pipe(gulpIf(isDevelopment, sourcemaps.init()))
 		.pipe(require('gulp-stylus')())
-    .pipe(require('gulp-concat')('style.css'))
+    .pipe(require('gulp-concat')('style_styl.css'))
 		.pipe(gulpIf(isDevelopment, sourcemaps.write('.')))
-		.pipe(gulp.dest('public'));
+		.pipe(gulp.dest('public/styles'));
 });
 
 //Автопрефиксер
 gulp.task('autoprefixer', function() {
-    return gulp.src('frontend/styles/**/*.css', {base: 'frontend'})
-        .pipe(gulpIf(isDevelopment, sourcemaps.init()))
-        .pipe(require('gulp-postcss')([ 
-            require('autoprefixer')({ browsers: ['last 3 versions'] }) 
-        ]))
-        .pipe(gulpIf(isDevelopment, sourcemaps.write('.')))
-        .pipe(gulp.dest('public'));
+    return gulp
+      .src('frontend/styles/**/*.css')
+      .pipe(gulpIf(isDevelopment, sourcemaps.init()))
+      .pipe(require('gulp-postcss')([ 
+        require('autoprefixer')({ browsers: ['last 3 versions'] }) 
+      ]))
+      .pipe(require('gulp-concat')('style_prefix.css'))
+      .pipe(gulpIf(isDevelopment, sourcemaps.write('.')))
+      .pipe(gulp.dest('public/styles'));
 });
 
 //Инкрементальная сборка
@@ -101,14 +102,14 @@ gulp.task('serve', function() {
 
 gulp.task('build', gulp.series(
   'clean',  
-  gulp.parallel('styles', 'autoprefixer'))
+  gulp.parallel('styles', 'autoprefixer', 'browserify', 'assets'))
 );
 
-gulp.task('default', gulp.series('test', 'build', 'browserify'));
+gulp.task('default', gulp.series('test', 'build'));
 
 //Запуск странички в браузере 
 //+ мониторинг и изменения в реальном времени
 gulp.task('dev',
     gulp.series(
-      gulp.series('default', 'assets'), 
+      'default', 
       gulp.parallel('watch', 'serve')));
